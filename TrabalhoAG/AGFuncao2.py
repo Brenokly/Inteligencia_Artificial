@@ -5,21 +5,45 @@ import matplotlib.pyplot as plt
 def fitnessfunction(x, y):
     return np.sqrt(x**3 + 2*y**4)
 
-# Função para o operador de crossover de um ponto
 def crossover(parent1, parent2):
-    num_genes = len(parent1) # Número de genes
-    crossover_point = np.random.randint(1, num_genes) # Ponto de crossover
-    child1 = np.concatenate((parent1[:crossover_point], parent2[crossover_point:])) # Filho 1
-    child2 = np.concatenate((parent2[:crossover_point], parent1[crossover_point:])) # Filho 2
-    return child1, child2 # Retornar os filhos
+    num_bits = 3 # Cada cromossomo é representado por 3 bits
+    child1 = np.zeros_like(parent1)
+    child2 = np.zeros_like(parent2)
 
-# Função para aplicar a mutação
-def mutate(child, mutation_probability): 
-    num_genes = len(child) # Número de genes
-    for i in range(num_genes): # Para cada gene
-        if np.random.rand() < mutation_probability: # Se a probabilidade de mutação for atendida
-            child[i] = np.random.uniform(0, 7) # Mutação do gene
-    return child # Retornar o filho mutado
+    for i in range(len(parent1)):
+        # Transformando os inteiros em suas representações binárias (3 bits)
+        p1_bits = np.array([int(b) for b in format(parent1[i], '03b')])
+        p2_bits = np.array([int(b) for b in format(parent2[i], '03b')])
+        
+        # Escolhe um ponto de crossover aleatório entre 1 e 2
+        crossover_point = np.random.randint(1, num_bits)
+        
+        # Realiza o crossover
+        c1_bits = np.concatenate((p1_bits[:crossover_point], p2_bits[crossover_point:]))
+        c2_bits = np.concatenate((p2_bits[:crossover_point], p1_bits[crossover_point:]))
+        
+        # Converte de volta os bits para inteiros
+        child1[i] = int(''.join(map(str, c1_bits)), 2)
+        child2[i] = int(''.join(map(str, c2_bits)), 2)
+        
+        return child1, child2
+
+def mutate(child, mutation_probability):
+    num_bits = 3  # Cada cromossomo é representado por 3 bits
+    
+    for i in range(len(child)):
+        # Converter o gene para a sua representação binária de 3 bits
+        bits = list(format(child[i], f'0{num_bits}b'))
+        
+        for j in range(num_bits):
+            if np.random.rand() < mutation_probability:
+                # Escolher um valor aleatório para o bit (0 ou 1)
+                bits[j] = str(np.random.randint(0, 2))
+        
+        # Converter a representação binária de volta para inteiro
+        child[i] = int(''.join(bits), 2)
+        
+        return child
 
 # Função para girar a roleta e selecionar um índice, evitando um índice excluído
 def spin(cumulative_intervals, excluded_index=None):
@@ -32,7 +56,7 @@ def spin(cumulative_intervals, excluded_index=None):
                 return i # Retornar o índice
 
 # Inicialização da população
-population = np.array([[4, 5], [6, 3], [2, 7], [5, 6]])
+population = np.array([[5, 2], [6, 4], [1, 5], [7, 3]])
 mutation_probability = 0.05 # Probabilidade de mutação
 
 # Aplicando a função de aptidão para toda a população
@@ -99,7 +123,7 @@ while not np.any(selection_probabilities > 0.99): # Enquanto nenhum indivíduo t
     selection_probabilities = (1 / fitness_values) / total_fitness # Calcular a probabilidade de seleção de cada indivíduo
     
     iterations += 1 # Incrementar o contador de iterações
-
+    
 all_fitness_values.append(np.min(fitness_values)) # Armazenar os valores do último indivíduo
 
 # Encontrar o indivíduo com a maior probabilidade de seleção
