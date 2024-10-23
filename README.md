@@ -50,8 +50,8 @@ Para executar os códigos, siga os passos abaixo:
 
 1. Clone este repositório:
    ```bash
-   git clone https://github.com/seuusuario/nome-do-repositorio.git
-   cd nome-do-repositorio
+   git clone https://github.com/seuusuario/Inteligencia_Artificial.git
+   cd Inteligencia_Artificial.git
    ```
 
 2. Instale as bibliotecas necessárias:
